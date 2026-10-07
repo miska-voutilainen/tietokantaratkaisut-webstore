@@ -1,0 +1,8 @@
+select c1_0.id,c1_0.name,count(distinct o1_0.id),sum(oi1_0.quantity),sum((oi1_0.quantity*oi1_0.unit_price)) from orderitems oi1_0 join orders o1_0 on o1_0.id=oi1_0.order_id join products p1_0 on p1_0.id=oi1_0.product_id join productcategories c1_0 on c1_0.id=p1_0.category_id where o1_0.order_date>=? and o1_0.order_date<? and o1_0.status<>? group by c1_0.id,c1_0.name order by sum((oi1_0.quantity*oi1_0.unit_price)) desc
+[MASSA] JPQL GROUP BY: 2025-01-01T00:00 - 2025-04-01T00:00 -> 10 tuoteryhmää
+select count(o1_0.id) from orders o1_0 where o1_0.status=? and o1_0.order_date<?
+update orders o1_0 set status=? where o1_0.status=? and o1_0.order_date<?
+select count(o1_0.id) from orders o1_0 where o1_0.status=? and o1_0.order_date<?
+[MASSA] JPQL UPDATE: NEW-tilauksia ennen 2024-06-01T00:00 oli 13934, päivitettiin 13934, jäljellä 0
+update products p1_0 set stock_quantity=(p1_0.stock_quantity+?),version=(p1_0.version+?) where p1_0.stock_quantity<?
+[MASSA] CriteriaUpdate: toimittaja=kaikki, saldo < 60 -> +40 kpl, päivitettiin 121 tuotetta

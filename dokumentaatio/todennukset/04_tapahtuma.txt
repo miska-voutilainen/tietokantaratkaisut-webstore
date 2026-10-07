@@ -1,0 +1,112 @@
+--------------
+SELECT @@event_scheduler AS event_scheduler
+--------------
+
++-----------------+
+| event_scheduler |
++-----------------+
+| ON              |
++-----------------+
+1 row in set (0.00 sec)
+
+--------------
+INSERT INTO orders (customer_id, status) VALUES (4242, 'NEW')
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+
+--------------
+INSERT INTO orderitems (order_id, product_id, quantity, unit_price)
+VALUES (LAST_INSERT_ID(), 3, 2, 849.66)
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+
+--------------
+SELECT 'ennen' AS vaihe, s.* FROM daily_sales_summary s WHERE sales_date = CURRENT_DATE
+--------------
+
+Empty set (0.00 sec)
+
+--------------
+SELECT COUNT(*) AS ajoja_lokissa_ennen FROM event_run_log WHERE event_name = 'ev_refresh_daily_sales'
+--------------
+
++---------------------+
+| ajoja_lokissa_ennen |
++---------------------+
+|                   0 |
++---------------------+
+1 row in set (0.00 sec)
+
+--------------
+ALTER EVENT ev_refresh_daily_sales
+    ON SCHEDULE EVERY 1 DAY STARTS CURRENT_TIMESTAMP + INTERVAL 3 SECOND
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+DO SLEEP(6)
+--------------
+
+Query OK, 0 rows affected (6.01 sec)
+
+--------------
+SELECT 'jälkeen' AS vaihe, s.* FROM daily_sales_summary s WHERE sales_date = CURRENT_DATE
+--------------
+
++----------+------------+-------------+------------+---------+----------------------------+
+| vaihe    | sales_date | order_count | item_count | revenue | refreshed_at               |
++----------+------------+-------------+------------+---------+----------------------------+
+| jälkeen  | 2026-10-07 |           2 |          2 | 1699.32 | 2026-10-07 15:54:06.931246 |
++----------+------------+-------------+------------+---------+----------------------------+
+1 row in set (0.00 sec)
+
+--------------
+SELECT event_name, started_at, finished_at, rows_affected
+FROM event_run_log
+ORDER BY id DESC
+LIMIT 3
+--------------
+
++------------------------+----------------------------+----------------------------+---------------+
+| event_name             | started_at                 | finished_at                | rows_affected |
++------------------------+----------------------------+----------------------------+---------------+
+| ev_refresh_daily_sales | 2026-10-07 15:54:06.930862 | 2026-10-07 15:54:06.933772 |             1 |
++------------------------+----------------------------+----------------------------+---------------+
+1 row in set (0.00 sec)
+
+--------------
+SELECT event_name, status, interval_value, interval_field, last_executed
+FROM information_schema.events
+WHERE event_schema = 'webstore'
+--------------
+
++------------------------+---------+----------------+----------------+---------------------+
+| EVENT_NAME             | STATUS  | INTERVAL_VALUE | INTERVAL_FIELD | LAST_EXECUTED       |
++------------------------+---------+----------------+----------------+---------------------+
+| ev_refresh_daily_sales | ENABLED | 1              | DAY            | 2026-10-07 15:54:06 |
+| ev_purge_old_logs      | ENABLED | 1              | MONTH          | NULL                |
++------------------------+---------+----------------+----------------+---------------------+
+2 rows in set (0.01 sec)
+
+--------------
+ALTER EVENT ev_refresh_daily_sales
+    ON SCHEDULE EVERY 1 DAY STARTS (CURRENT_DATE + INTERVAL 1 DAY + INTERVAL 2 HOUR)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT event_name, starts FROM information_schema.events WHERE event_name = 'ev_refresh_daily_sales'
+--------------
+
++------------------------+---------------------+
+| EVENT_NAME             | STARTS              |
++------------------------+---------------------+
+| ev_refresh_daily_sales | 2026-10-08 02:00:00 |
++------------------------+---------------------+
+1 row in set (0.00 sec)
+
+Bye

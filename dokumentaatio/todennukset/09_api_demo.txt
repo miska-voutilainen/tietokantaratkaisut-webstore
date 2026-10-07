@@ -1,0 +1,310 @@
+﻿===== Perusresurssit =====
+GET /api/customers/4242
+{"id":4242,"firstName":"Dale","lastName":"Dominguez","email":"erinbaker4242@example.net","phone":"001-621-836-5072"}
+  -> HTTP 200
+
+
+POST /api/customers
+  {"firstName":"Maija","lastName":"Meikäläinen","email":"maija.demo@example.com","phone":"0401234567"}
+{"id":100001,"firstName":"Maija","lastName":"Meikäläinen","email":"maija.demo@example.com","phone":"0401234567"}
+  -> HTTP 201
+
+
+GET /api/products/3
+{"id":3,"name":"Quantum Widget 457","description":"Ask decide need next very capital.","price":849.66,"stockQuantity":313,"categoryId":3,"categoryName":"Vaatteet","supplierId":17,"version":0}
+  -> HTTP 200
+
+
+PUT /api/products/3
+  {"name":"Quantum Widget 457","description":"Päivitetty kuvaus","stockQuantity":313,"categoryId":3,"supplierId":17}
+{"id":3,"name":"Quantum Widget 457","description":"Päivitetty kuvaus","price":849.66,"stockQuantity":313,"categoryId":3,"categoryName":"Vaatteet","supplierId":17,"version":1}
+  -> HTTP 200
+
+
+DELETE /api/products/3
+{"type":"about:blank","title":"Conflict","status":409,"detail":"Muutos rikkoisi tietokannan eheyden","instance":"/api/products/3"}
+  -> HTTP 409
+
+
+===== Criteria API: dynaaminen tuotehaku =====
+GET /api/products?categoryId=1&maxPrice=50&inStock=true&limit=5
+[{"id":396,"name":"Atomic Stone 221","description":"Current number focus close six family least suggest force population.","price":15.21,"stockQuantity":296,"categoryId":1,"categoryName":"Elektroniikka","supplierId":83,"version":0},{"id":457,"name":"Smart Shield 677","description":"He pressure because recognize walk table line glass.","price":16.00,"stockQuantity":231,"categoryId":1,"categoryName":"Elektroniikka","supplierId":28,"version":0},{"id":899,"name":"Happy Bug 816","description":"Energy late similar black arm picture not thousand result pretty physical.","price":24.60,"stockQuantity":1,"categoryId":1,"categoryName":"Elektroniikka","supplierId":50,"version":2},{"id":923,"name":"Turbo Ring 709","description":"Recognize serve increase local everyone today simple somebody hour live.","price":29.19,"stockQuantity":186,"categoryId":1,"categoryName":"Elektroniikka","supplierId":26,"version":0},{"id":586,"name":"Mighty Planet 157","description":"Develop accept cost theory reality perhaps adult.","price":32.64,"stockQuantity":292,"categoryId":1,"categoryName":"Elektroniikka","supplierId":59,"version":0}]
+  -> HTTP 200
+
+
+GET /api/products?name=quantum&minPrice=500&limit=5
+[{"id":792,"name":"Quantum Ring 863","description":"Few even third human.","price":513.11,"stockQuantity":429,"categoryId":8,"categoryName":"Puutarha & piha","supplierId":57,"version":0},{"id":327,"name":"Quantum Plug 568","description":"Civil meeting draw middle key.","price":542.08,"stockQuantity":139,"categoryId":1,"categoryName":"Elektroniikka","supplierId":80,"version":0},{"id":728,"name":"Quantum Carrier 128","description":"Identify century somebody significant manage third teacher worker.","price":548.43,"stockQuantity":497,"categoryId":6,"categoryName":"Puhelimet & lisävarusteet","supplierId":44,"version":0},{"id":690,"name":"Quantum Clip 603","description":"Lay future add machine safe owner yard capital.","price":570.23,"stockQuantity":429,"categoryId":2,"categoryName":"Kodin tarvikkeet","supplierId":38,"version":0},{"id":793,"name":"Quantum Hat 711","description":"Among key card on edge training beat speech natural he.","price":616.84,"stockQuantity":457,"categoryId":7,"categoryName":"Huonekalut","supplierId":6,"version":0}]
+  -> HTTP 200
+
+
+===== Tilaus: atominen saldon vähennys ja tilaloki (liipaisin) =====
+SQL> SELECT id, stock_quantity FROM products WHERE id IN (5, 6)
++----+----------------+
+| id | stock_quantity |
++----+----------------+
+|  5 |            421 |
+|  6 |            440 |
++----+----------------+
+
+POST /api/orders
+  {"customerId":4242,"items":[{"productId":5,"quantity":2},{"productId":6,"quantity":1}]}
+{"id":200005,"customerId":4242,"orderDate":"2026-10-07T15:55:09","deliveryDate":null,"status":"NEW","total":1734.67,"items":[{"productId":5,"productName":"Lite Bug 867","quantity":2,"unitPrice":709.10},{"productId":6,"productName":"Atomic Clip 515","quantity":1,"unitPrice":316.47}]}
+  -> HTTP 201
+
+
+SQL> SELECT id, stock_quantity FROM products WHERE id IN (5, 6)
++----+----------------+
+| id | stock_quantity |
++----+----------------+
+|  5 |            419 |
+|  6 |            439 |
++----+----------------+
+
+POST /api/orders
+  {"customerId":4242,"items":[{"productId":5,"quantity":1},{"productId":6,"quantity":100000}]}
+{"type":"about:blank","title":"Conflict","status":409,"detail":"Varastosaldo ei riitä tuotteelle 6","instance":"/api/orders"}
+  -> HTTP 409
+
+
+SQL> SELECT id, stock_quantity FROM products WHERE id IN (5, 6)
++----+----------------+
+| id | stock_quantity |
++----+----------------+
+|  5 |            419 |
+|  6 |            439 |
++----+----------------+
+
+GET /api/orders/200005
+{"id":200005,"customerId":4242,"orderDate":"2026-10-07T15:55:09","deliveryDate":null,"status":"NEW","total":1734.67,"items":[{"productId":5,"productName":"Lite Bug 867","quantity":2,"unitPrice":709.10},{"productId":6,"productName":"Atomic Clip 515","quantity":1,"unitPrice":316.47}]}
+  -> HTTP 200
+
+
+PUT /api/orders/200005/status
+  {"status":"SHIPPED"}
+{"id":200005,"customerId":4242,"orderDate":"2026-10-07T15:55:09","deliveryDate":"2026-10-07T15:55:08.8375726","status":"SHIPPED","total":null,"items":[]}
+  -> HTTP 200
+
+
+GET /api/orders/200005/status-history
+[{"oldStatus":null,"newStatus":"NEW","changedAt":"2026-10-07T15:55:08.556806","changedBy":"webstore_app@localhost"},{"oldStatus":"NEW","newStatus":"SHIPPED","changedAt":"2026-10-07T15:55:08.839833","changedBy":"webstore_app@localhost"}]
+  -> HTTP 200
+
+
+===== Hintahistoria: proseduuri ja temporaalinen haku =====
+PUT /api/products/9/price
+  {"price":99999,"reason":"näppäilyvirhe"}
+{"type":"about:blank","title":"Bad Request","status":400,"detail":"Hinta saa muuttua kerralla enintään 50 %","instance":"/api/products/9/price"}
+  -> HTTP 400
+
+
+PUT /api/products/9/price
+  {"price":1.00,"reason":"liian suuri muutos"}
+{"type":"about:blank","title":"Bad Request","status":400,"detail":"Hinta saa muuttua kerralla enintään 50 %","instance":"/api/products/9/price"}
+  -> HTTP 400
+
+
+SQL> SELECT id, price, version FROM products WHERE id = 9
++----+--------+---------+
+| id | price  | version |
++----+--------+---------+
+|  9 | 526.56 |       0 |
++----+--------+---------+
+
+GET /api/products/9
+{"id":9,"name":"Swift Pad 577","description":"Tonight style share thus study wrong interest.","price":526.56,"stockQuantity":151,"categoryId":7,"categoryName":"Huonekalut","supplierId":54,"version":0}
+  -> HTTP 200
+
+
+PUT /api/products/9/price
+  {"price":473.90,"reason":"kampanja -10 %"}
+{"id":9,"name":"Swift Pad 577","description":"Tonight style share thus study wrong interest.","price":473.90,"stockQuantity":151,"categoryId":7,"categoryName":"Huonekalut","supplierId":54,"version":1}
+  -> HTTP 200
+
+
+GET /api/products/9/price-history
+[{"price":526.56,"validFrom":"2026-10-07T15:53:56.467538","validTo":"2026-10-07T15:55:10.154957","changeReason":"alkuarvo asennuksessa","changedBy":"root@localhost"},{"price":473.90,"validFrom":"2026-10-07T15:55:10.154957","validTo":null,"changeReason":"kampanja -10 %","changedBy":"webstore_app@localhost"}]
+  -> HTTP 200
+
+
+GET /api/products/9/price-at?at=2026-10-07T15:55:09
+{"price":526.56,"validFrom":"2026-10-07T15:53:56.467538","validTo":"2026-10-07T15:55:10.154957","changeReason":"alkuarvo asennuksessa","changedBy":"root@localhost"}
+  -> HTTP 200
+
+
+===== JPQL: myynti tuoteryhmittäin (GROUP BY) =====
+GET /api/reports/sales-by-category?from=2025-01-01&to=2025-04-01
+[{"categoryId":10,"categoryName":"Urheilu & vapaa-aika","orderCount":6753,"itemCount":26868,"revenue":15021239.21},{"categoryId":7,"categoryName":"Huonekalut","orderCount":7069,"itemCount":28571,"revenue":14303548.79},{"categoryId":3,"categoryName":"Vaatteet","orderCount":7460,"itemCount":31232,"revenue":13968517.89},{"categoryId":2,"categoryName":"Kodin tarvikkeet","orderCount":6986,"itemCount":27708,"revenue":13729502.36},{"categoryId":6,"categoryName":"Puhelimet & lisävarusteet","orderCount":6907,"itemCount":27575,"revenue":13234428.60},{"categoryId":5,"categoryName":"Työkalut","orderCount":6922,"itemCount":27478,"revenue":12805066.10},{"categoryId":1,"categoryName":"Elektroniikka","orderCount":6667,"itemCount":26469,"revenue":12102559.58},{"categoryId":8,"categoryName":"Puutarha & piha","orderCount":6250,"itemCount":24045,"revenue":12003445.41},{"categoryId":4,"categoryName":"Elintarvikkeet","orderCount":6397,"itemCount":25005,"revenue":11547578.20},{"categoryId":9,"categoryName":"Kirjat & toimisto","orderCount":6157,"itemCount":24162,"revenue":11488800.60}]
+  -> HTTP 200
+
+
+===== JPQL @Modifying: vanhojen käsittelemättömien tilausten peruminen =====
+SQL> SELECT status, COUNT(*) AS lkm FROM orders WHERE order_date < '2024-06-01' GROUP BY status
++-----------+-------+
+| status    | lkm   |
++-----------+-------+
+| CANCELLED | 23849 |
+| NEW       | 13934 |
+| SHIPPED   | 18986 |
++-----------+-------+
+
+POST /api/admin/orders/cancel-stale?before=2024-06-01
+{"operation":"cancel-stale-orders","affectedRows":13934}
+  -> HTTP 200
+
+
+SQL> SELECT status, COUNT(*) AS lkm FROM orders WHERE order_date < '2024-06-01' GROUP BY status
++-----------+-------+
+| status    | lkm   |
++-----------+-------+
+| CANCELLED | 37783 |
+| SHIPPED   | 18986 |
++-----------+-------+
+
+SQL> SELECT COUNT(*) AS liipaisimen_lokirivit FROM order_status_history WHERE new_status = 'CANCELLED' AND changed_by LIKE 'webstore_app@%'
++-----------------------+
+| liipaisimen_lokirivit |
++-----------------------+
+|                 18833 |
++-----------------------+
+
+===== CriteriaUpdate: vähissä olevien tuotteiden täydennys =====
+SQL> SELECT supplier_id, id, stock_quantity, version FROM products WHERE stock_quantity < 60 ORDER BY supplier_id, id
++-------------+-----+----------------+---------+
+| supplier_id | id  | stock_quantity | version |
++-------------+-----+----------------+---------+
+|           2 | 451 |             57 |       1 |
+|           3 | 560 |             58 |       0 |
+|           3 | 939 |             33 |       0 |
+|           4 | 568 |             51 |       0 |
+|           5 | 776 |             28 |       0 |
+|           6 | 570 |             13 |       0 |
+|           7 |  29 |             53 |       1 |
+|           7 |  92 |             51 |       0 |
+|           7 | 596 |             37 |       0 |
+|           8 | 165 |             22 |       0 |
+|           9 | 128 |             49 |       0 |
+|           9 | 795 |             13 |       0 |
+|          10 | 687 |             54 |       0 |
+|          12 | 103 |             48 |       0 |
+|          12 | 150 |             22 |       0 |
+|          12 | 381 |             14 |       0 |
+|          14 | 604 |             10 |       0 |
+|          15 | 578 |             23 |       0 |
+|          16 | 107 |             45 |       0 |
+|          16 | 433 |             26 |       0 |
+|          18 | 702 |             51 |       1 |
+|          20 | 446 |             36 |       0 |
+|          21 | 947 |             14 |       0 |
+|          22 | 656 |             55 |       1 |
+|          22 | 675 |             15 |       0 |
+|          24 | 264 |             57 |       1 |
+|          24 | 638 |             28 |       0 |
+|          25 | 823 |             42 |       0 |
+|          27 | 469 |             49 |       0 |
+|          28 |  50 |             24 |       0 |
+|          28 | 159 |             10 |       0 |
+|          30 | 772 |             27 |       0 |
+|          32 | 639 |             19 |       0 |
+|          33 | 170 |             35 |       0 |
+|          34 |  56 |             56 |       0 |
+|          35 | 494 |             44 |       0 |
+|          35 | 880 |             14 |       0 |
+|          35 | 982 |             53 |       1 |
+|          36 | 403 |             23 |       0 |
+|          36 | 416 |             38 |       0 |
+|          36 | 663 |             25 |       0 |
+|          37 | 363 |             11 |       0 |
+|          38 | 770 |             11 |       0 |
+|          39 | 716 |             18 |       0 |
+|          40 | 689 |             45 |       0 |
+|          40 | 852 |             52 |       1 |
+|          41 | 306 |             42 |       0 |
+|          43 |  74 |             24 |       0 |
+|          44 | 378 |             25 |       0 |
+|          44 | 549 |             17 |       0 |
+|          47 | 472 |             56 |       1 |
+|          47 | 919 |             19 |       0 |
+|          49 | 747 |             18 |       0 |
+|          50 | 463 |             24 |       0 |
+|          50 | 899 |              1 |       2 |
+|          51 | 643 |             28 |       0 |
+|          52 | 836 |             59 |       0 |
+|          52 | 956 |             51 |       1 |
+|          53 | 105 |             52 |       1 |
+|          53 | 526 |             50 |       1 |
+|          54 |  14 |             49 |       0 |
+|          54 |  27 |             19 |       0 |
+|          55 |  35 |             23 |       0 |
+|          55 |  80 |             27 |       0 |
+|          55 | 281 |             44 |       0 |
+|          55 | 299 |             28 |       0 |
+|          57 | 402 |             56 |       0 |
+|          57 | 785 |             46 |       0 |
+|          57 | 805 |             50 |       1 |
+|          58 |  82 |             14 |       0 |
+|          59 |  26 |             26 |       0 |
+|          59 |  57 |             27 |       0 |
+|          59 | 186 |             44 |       0 |
+|          59 | 260 |             51 |       1 |
+|          59 | 775 |             44 |       0 |
+|          60 | 392 |             56 |       0 |
+|          60 | 556 |             58 |       1 |
+|          60 | 910 |             56 |       0 |
+|          61 | 439 |             18 |       0 |
+|          62 |  69 |             20 |       0 |
+|          62 | 136 |             52 |       1 |
+|          65 |  71 |             25 |       0 |
+|          65 | 375 |             36 |       0 |
+|          65 | 752 |             28 |       0 |
+|          66 | 555 |             57 |       1 |
+|          68 | 238 |             50 |       0 |
+|          68 | 745 |             31 |       0 |
+|          69 | 184 |             47 |       0 |
+|          70 | 537 |             56 |       1 |
+|          70 | 563 |             13 |       0 |
+|          71 | 950 |             48 |       0 |
+|          72 | 133 |             43 |       0 |
+|          73 | 181 |             29 |       0 |
+|          74 | 497 |             32 |       0 |
+|          74 | 622 |             32 |       0 |
+|          75 | 295 |             36 |       0 |
+|          75 | 917 |             28 |       0 |
+|          77 | 569 |             40 |       0 |
+|          77 | 592 |             30 |       0 |
+|          78 | 332 |             53 |       1 |
+|          78 | 738 |             25 |       0 |
+|          78 | 902 |             50 |       1 |
+|          79 | 681 |             29 |       0 |
+|          84 | 145 |             54 |       0 |
+|          84 | 861 |             59 |       0 |
+|          85 | 342 |             52 |       0 |
+|          87 | 589 |             52 |       0 |
+|          87 | 915 |             28 |       0 |
+|          89 | 198 |             55 |       0 |
+|          90 | 846 |             50 |       0 |
+|          91 | 751 |             38 |       0 |
+|          92 | 536 |             57 |       0 |
+|          93 | 258 |             26 |       0 |
+|          93 | 449 |             33 |       0 |
+|          95 | 840 |             22 |       0 |
+|          96 | 385 |             13 |       0 |
+|          97 | 127 |             59 |       0 |
+|          97 | 699 |             47 |       0 |
+|          98 | 876 |             56 |       0 |
+|         100 | 218 |             31 |       0 |
+|         100 | 254 |             56 |       1 |
++-------------+-----+----------------+---------+
+
+POST /api/admin/products/restock
+  {"threshold":60,"amount":40}
+{"operation":"restock-low-stock","affectedRows":121}
+  -> HTTP 200
+
+
+SQL> SELECT COUNT(*) AS alle_60_kpl FROM products WHERE stock_quantity < 60
++-------------+
+| alle_60_kpl |
++-------------+
+|          21 |
++-------------+
+

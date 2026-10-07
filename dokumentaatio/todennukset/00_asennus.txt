@@ -1,0 +1,20 @@
+﻿Migraatiot koottu: C:\Users\miska\Desktop\Tietokantaratkaisut\kanta\webstore_migraatiot.sql
+1/3 Luodaan webstore-skeema uudelleen
+2/3 Ladataan schema_populated_dump.sql
+3/3 Ajetaan migraatiot
+kohde	lkm
+taulut	13
+näkymät	4
+liipaisimet	5
+proseduurit	3
+tapahtumat	2
+indeksit (ei PK)	15
+roolit	3
+käyttäjät	3
+tuotteita	1000
+tilauksia	200000
+hintahistoriarivejä	1000
+myyntikoostepäiviä	731
+event_scheduler
+ON
+Valmis.

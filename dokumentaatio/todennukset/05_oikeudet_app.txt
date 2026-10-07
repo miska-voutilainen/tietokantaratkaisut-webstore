@@ -1,0 +1,75 @@
+--------------
+SELECT CURRENT_USER() AS kayttaja, CURRENT_ROLE() AS roolit
+--------------
+
++------------------------+-------------------------+
+| kayttaja               | roolit                  |
++------------------------+-------------------------+
+| webstore_app@localhost | `webstore_app_role`@`%` |
++------------------------+-------------------------+
+1 row in set (0.00 sec)
+
+--------------
+UPDATE products SET stock_quantity = stock_quantity + 1 WHERE id = 8
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+UPDATE products SET price = 1.00 WHERE id = 8
+--------------
+
+ERROR 1143 (42000) at line 11: UPDATE command denied to user 'webstore_app'@'localhost' for column 'price' in table 'products'
+--------------
+DELETE FROM orders WHERE id = 1
+--------------
+
+ERROR 1142 (42000) at line 14: DELETE command denied to user 'webstore_app'@'localhost' for table 'orders'
+--------------
+DELETE FROM orderitems WHERE order_id = 1
+--------------
+
+ERROR 1142 (42000) at line 17: DELETE command denied to user 'webstore_app'@'localhost' for table 'orderitems'
+--------------
+CALL change_product_price(8, 99999.00, 'näppäilyvirhe')
+--------------
+
+ERROR 1644 (45000) at line 20: Hinta saa muuttua kerralla enintään 50 %
+--------------
+CALL change_product_price(8, 10.00, '')
+--------------
+
+ERROR 1644 (45000) at line 21: Hinnanmuutokselle on annettava syy
+--------------
+SELECT price INTO @old FROM products WHERE id = 8
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+
+--------------
+SET @new = ROUND(@old * 1.10, 2)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+CALL change_product_price(8, @new, 'hinnankorotus 10 %')
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT product_id, price, valid_from, valid_to, change_reason, changed_by
+FROM product_price_history WHERE product_id = 8 ORDER BY id
+--------------
+
++------------+--------+----------------------------+----------------------------+-----------------------+------------------------+
+| product_id | price  | valid_from                 | valid_to                   | change_reason         | changed_by             |
++------------+--------+----------------------------+----------------------------+-----------------------+------------------------+
+|          8 | 697.49 | 2026-10-07 15:53:56.467538 | 2026-10-07 15:54:09.990146 | alkuarvo asennuksessa | root@localhost         |
+|          8 | 767.24 | 2026-10-07 15:54:09.990146 | NULL                       | hinnankorotus 10 %    | webstore_app@localhost |
++------------+--------+----------------------------+----------------------------+-----------------------+------------------------+
+2 rows in set (0.00 sec)
+
+Bye

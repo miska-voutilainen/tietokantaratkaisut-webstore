@@ -1,0 +1,122 @@
+--------------
+SELECT id, name, price, version FROM products WHERE id = 7
+--------------
+
++----+---------------+--------+---------+
+| id | name          | price  | version |
++----+---------------+--------+---------+
+|  7 | Magic Bit 840 | 352.35 |       0 |
++----+---------------+--------+---------+
+1 row in set (0.00 sec)
+
+--------------
+SELECT price INTO @alkuhinta FROM products WHERE id = 7
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+
+--------------
+CALL change_product_price(7, ROUND(@alkuhinta * 0.80, 2), 'kampanja: syysale -20 %')
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+DO SLEEP(1)
+--------------
+
+Query OK, 0 rows affected (1.00 sec)
+
+--------------
+CALL change_product_price(7, @alkuhinta, 'kampanja päättyi')
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+DO SLEEP(1)
+--------------
+
+Query OK, 0 rows affected (1.00 sec)
+
+--------------
+SET @hetki_ennen_korotusta = NOW(6)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+DO SLEEP(1)
+--------------
+
+Query OK, 0 rows affected (1.01 sec)
+
+--------------
+CALL change_product_price(7, ROUND(@alkuhinta * 1.08, 2), 'toimittajan hinnankorotus +8 %')
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+SELECT id, name, price, version FROM products WHERE id = 7
+--------------
+
++----+---------------+--------+---------+
+| id | name          | price  | version |
++----+---------------+--------+---------+
+|  7 | Magic Bit 840 | 380.54 |       3 |
++----+---------------+--------+---------+
+1 row in set (0.00 sec)
+
+--------------
+SELECT price, valid_from, valid_to, change_reason, changed_by
+FROM product_price_history
+WHERE product_id = 7
+ORDER BY valid_from
+--------------
+
++--------+----------------------------+----------------------------+--------------------------------+------------------------+
+| price  | valid_from                 | valid_to                   | change_reason                  | changed_by             |
++--------+----------------------------+----------------------------+--------------------------------+------------------------+
+| 352.35 | 2026-10-07 15:53:56.467538 | 2026-10-07 15:54:00.739885 | alkuarvo asennuksessa          | root@localhost         |
+| 281.88 | 2026-10-07 15:54:00.739885 | 2026-10-07 15:54:01.747161 | kampanja: syysale -20 %        | webstore_app@localhost |
+| 352.35 | 2026-10-07 15:54:01.747161 | 2026-10-07 15:54:03.767794 | kampanja päättyi               | webstore_app@localhost |
+| 380.54 | 2026-10-07 15:54:03.767794 | NULL                       | toimittajan hinnankorotus +8 % | webstore_app@localhost |
++--------+----------------------------+----------------------------+--------------------------------+------------------------+
+4 rows in set (0.00 sec)
+
+--------------
+SELECT @hetki_ennen_korotusta AS ajankohta, price AS voimassa_ollut_hinta
+FROM product_price_history
+WHERE product_id = 7
+  AND valid_from <= @hetki_ennen_korotusta
+  AND (valid_to IS NULL OR valid_to > @hetki_ennen_korotusta)
+--------------
+
++----------------------------+----------------------+
+| ajankohta                  | voimassa_ollut_hinta |
++----------------------------+----------------------+
+| 2026-10-07 15:54:02.752434 |               352.35 |
++----------------------------+----------------------+
+1 row in set (0.00 sec)
+
+--------------
+SELECT product_name, previous_price, new_price,
+       ROUND((new_price - previous_price) / previous_price * 100, 1) AS muutos_pros,
+       changed_at, change_reason
+FROM v_product_price_changes
+WHERE product_id = 7
+ORDER BY changed_at
+--------------
+
++---------------+----------------+-----------+-------------+----------------------------+--------------------------------+
+| product_name  | previous_price | new_price | muutos_pros | changed_at                 | change_reason                  |
++---------------+----------------+-----------+-------------+----------------------------+--------------------------------+
+| Magic Bit 840 |           NULL |    352.35 |        NULL | 2026-10-07 15:53:56.467538 | alkuarvo asennuksessa          |
+| Magic Bit 840 |         352.35 |    281.88 |       -20.0 | 2026-10-07 15:54:00.739885 | kampanja: syysale -20 %        |
+| Magic Bit 840 |         281.88 |    352.35 |        25.0 | 2026-10-07 15:54:01.747161 | kampanja päättyi               |
+| Magic Bit 840 |         352.35 |    380.54 |         8.0 | 2026-10-07 15:54:03.767794 | toimittajan hinnankorotus +8 % |
++---------------+----------------+-----------+-------------+----------------------------+--------------------------------+
+4 rows in set (0.00 sec)
+
+Bye

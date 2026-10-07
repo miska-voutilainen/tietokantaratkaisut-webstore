@@ -1,0 +1,12 @@
+# Kurssin palautukset ja niiden apukansiot eivät kuulu projektiin
+*.docx
+*.pdf
+.template-distill/
+.transaction-diary/
+.jpa-diary/
+
+# Purettu dump (versionhallinnassa pakattuna .gz-muodossa)
+schema_populated_dump.sql
+
+# Maven
+jpa/target/

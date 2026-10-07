@@ -1,0 +1,64 @@
+[MASSA] JPQL UPDATE: NEW-tilauksia ennen 2025-01-01T00:00 oli 3, päivitettiin 3, jäljellä 0
+[MASSA] CriteriaUpdate: toimittaja=kaikki, saldo < 3 -> +10 kpl, päivitettiin 3 tuotetta
+[MASSA] JPQL GROUP BY: 2024-01-01T00:00 - 2025-01-01T00:00 -> 1 tuoteryhmää
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.113 s -- in fi.metropolia.webstore.ApiTest
+[PREUPDATE] saldo 3, yritetään vähentää 5 -> Varastosaldo ei voi olla negatiivinen: -2
+[PREUPDATE] saldo tietokannassa yrityksen jälkeen: 3
+[PREPERSIST] ennen persist: orderDate=null, status=null
+[PREPERSIST] tietokannassa: order_date=2026-10-07 15:54:43.284327, status=NEW
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.464 s -- in fi.metropolia.webstore.LifecycleEventTest
+[MASSA] JPQL GROUP BY: 2024-01-01T00:00 - 2025-01-01T00:00 -> 2 tuoteryhmää
+[MASSA] raporttirivi: CategorySales[categoryId=1, categoryName=Elektroniikka, orderCount=3, itemCount=9, revenue=219.10]
+[MASSA] raporttirivi: CategorySales[categoryId=2, categoryName=Vaatteet, orderCount=2, itemCount=2, revenue=143.90]
+[MASSA] CriteriaUpdate: toimittaja=7, saldo < 10 -> +20 kpl, päivitettiin 2 tuotetta
+[MASSA] vanhan entiteetin tallennus massapäivityksen jälkeen -> OptimisticLockException
+[MASSA] saldot ennen: [{id=101, supplier_id=7, stock_quantity=2, version=0}, {id=102, supplier_id=7, stock_quantity=5, version=0}, {id=103, supplier_id=7, stock_quantity=50, version=0}, {id=104, supplier_id=8, stock_quantity=1, version=0}, {id=105, supplier_id=8, stock_quantity=0, version=0}, {id=106, supplier_id=9, stock_quantity=30, version=0}]
+[MASSA] CriteriaUpdate: toimittaja=7, saldo < 10 -> +20 kpl, päivitettiin 2 tuotetta
+[MASSA] saldot jälkeen: [{id=101, supplier_id=7, stock_quantity=22, version=1}, {id=102, supplier_id=7, stock_quantity=25, version=1}, {id=103, supplier_id=7, stock_quantity=50, version=0}, {id=104, supplier_id=8, stock_quantity=1, version=0}, {id=105, supplier_id=8, stock_quantity=0, version=0}, {id=106, supplier_id=9, stock_quantity=30, version=0}]
+[MASSA] CriteriaUpdate: toimittaja=kaikki, saldo < 10 -> +5 kpl, päivitettiin 4 tuotetta
+[MASSA] JPQL UPDATE: NEW-tilauksia ennen 2025-01-01T00:00 oli 3, päivitettiin 3, jäljellä 0
+[MASSA] JPQL UPDATE: NEW-tilauksia ennen 2025-01-01T00:00 oli 0, päivitettiin 0, jäljellä 0
+[MASSA] tilaukset ennen: [{id=1001, order_date=2024-01-10 10:00:00.0, status=NEW}, {id=1002, order_date=2024-02-15 12:00:00.0, status=NEW}, {id=1003, order_date=2024-03-20 09:30:00.0, status=NEW}, {id=1004, order_date=2025-06-01 08:00:00.0, status=NEW}, {id=1005, order_date=2024-01-05 16:00:00.0, status=SHIPPED}, {id=1006, order_date=2024-02-01 11:00:00.0, status=CANCELLED}]
+[MASSA] JPQL UPDATE: NEW-tilauksia ennen 2025-01-01T00:00 oli 3, päivitettiin 3, jäljellä 0
+[MASSA] tilaukset jälkeen: [{id=1001, order_date=2024-01-10 10:00:00.0, status=CANCELLED}, {id=1002, order_date=2024-02-15 12:00:00.0, status=CANCELLED}, {id=1003, order_date=2024-03-20 09:30:00.0, status=CANCELLED}, {id=1004, order_date=2025-06-01 08:00:00.0, status=NEW}, {id=1005, order_date=2024-01-05 16:00:00.0, status=SHIPPED}, {id=1006, order_date=2024-02-01 11:00:00.0, status=CANCELLED}]
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.098 s -- in fi.metropolia.webstore.MassOperationTest
+[MASSA] JPQL UPDATE: NEW-tilauksia ennen 2024-01-01T00:00 oli 4899, päivitettiin 4899, jäljellä 0
+[MYSQL] JPQL UPDATE: ennen 4899, päivitetty 4899, jälkeen 0, lokirivejä +4899, 235 ms
+[MASSA] JPQL GROUP BY: 2025-01-01T00:00 - 2025-07-01T00:00 -> 10 tuoteryhmää
+[MYSQL] CategorySales[categoryId=10, categoryName=Urheilu & vapaa-aika, orderCount=13658, itemCount=54144, revenue=30104733.71]
+[MYSQL] CategorySales[categoryId=7, categoryName=Huonekalut, orderCount=14198, itemCount=57516, revenue=28962498.84]
+[MYSQL] CategorySales[categoryId=3, categoryName=Vaatteet, orderCount=15083, itemCount=63078, revenue=28458755.25]
+[MYSQL] CategorySales[categoryId=2, categoryName=Kodin tarvikkeet, orderCount=14012, itemCount=55554, revenue=27524164.79]
+[MYSQL] CategorySales[categoryId=6, categoryName=Puhelimet & lisävarusteet, orderCount=13867, itemCount=55228, revenue=26314431.70]
+[MYSQL] CategorySales[categoryId=5, categoryName=Työkalut, orderCount=13988, itemCount=55859, revenue=25996016.67]
+[MYSQL] CategorySales[categoryId=8, categoryName=Puutarha & piha, orderCount=12622, itemCount=48651, revenue=24475465.93]
+[MYSQL] CategorySales[categoryId=1, categoryName=Elektroniikka, orderCount=13364, itemCount=53377, revenue=24381052.93]
+[MYSQL] CategorySales[categoryId=9, categoryName=Kirjat & toimisto, orderCount=12512, itemCount=48621, revenue=23297435.45]
+[MYSQL] CategorySales[categoryId=4, categoryName=Elintarvikkeet, orderCount=12807, itemCount=50132, revenue=23152730.59]
+[MYSQL] raportti 10 riviä, 845 ms
+[MASSA] CriteriaUpdate: toimittaja=kaikki, saldo < 10 -> +50 kpl, päivitettiin 21 tuotetta
+[MYSQL] CriteriaUpdate: alle 10 kpl ennen 21, päivitetty 21, jälkeen 0
+[MYSQL] samanaikaiset tilaukset: [TORJUTTU: Varastosaldo ei riitä tuotteelle 899, OK, tilaus 200003], saldo lopuksi 1
+[MYSQL] silmukka: 2776 tilausta, 1 SELECT + 2776 UPDATE, 1169 ms
+[MYSQL] massa-UPDATE: 2525 tilausta, 1 UPDATE, 124 ms
+[MYSQL] suora hinnan UPDATE -> UPDATE command denied to user 'webstore_app'@'localhost' for column 'price' in table 'products'
+[MYSQL] hinta 60.49 -> 63.51, versio 0 -> 1
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.069 s -- in fi.metropolia.webstore.MySqlIntegrationTest
+[VERSION] A ja B lukevat: saldo=136, version=0
+[VERSION] A tilaa 2 kpl ja tallentaa: saldo=134, version=1
+[VERSION] B tilaa 5 kpl vanhan saldon perusteella -> OptimisticLockException
+[VERSION] tietokannassa konfliktin jälkeen: saldo=134, version=1
+[VERSION] B:n uusintayritys: saldo=129, version=2
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in fi.metropolia.webstore.OptimisticLockingTest
+[CONVERTER] Java ennen tallennusta: TOIMITETTU
+[CONVERTER] orders.status tietokannassa: SHIPPED
+[CONVERTER] Java uudelleenluvun jälkeen: TOIMITETTU
+[CONVERTER] SQL:llä lisätty 'CANCELLED' luetaan Javaan: PERUTTU
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in fi.metropolia.webstore.OrderStatusConverterTest
+[CRITERIA] ProductSearchCriteria[name=null, categoryId=1, supplierId=null, minPrice=10.00, maxPrice=100.00, inStock=true, limit=null] -> [102, 101]
+[CRITERIA] ProductSearchCriteria[name=KUULO, categoryId=null, supplierId=null, minPrice=null, maxPrice=null, inStock=null, limit=null] -> [101]
+[CRITERIA] ProductSearchCriteria[name=null, categoryId=null, supplierId=8, minPrice=null, maxPrice=null, inStock=true, limit=null] -> [104]
+[CRITERIA] ProductSearchCriteria[name=null, categoryId=null, supplierId=null, minPrice=null, maxPrice=null, inStock=null, limit=null] -> [103, 104, 102, 101, 105, 106]
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.060 s -- in fi.metropolia.webstore.ProductSearchTest
+[INFO] Tests run: 29, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS

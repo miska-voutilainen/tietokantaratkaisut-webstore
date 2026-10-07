@@ -1,0 +1,9 @@
+CREATE TABLE customers (id INT AUTO_INCREMENT PRIMARY KEY, first_name VARCHAR(100) NOT NULL, last_name VARCHAR(100) NOT NULL, email VARCHAR(255) NOT NULL UNIQUE, phone VARCHAR(30));
+CREATE TABLE productcategories (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100) NOT NULL, description TEXT);
+CREATE TABLE products (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) NOT NULL, description TEXT, price DECIMAL(10,2) NOT NULL, stock_quantity INT NOT NULL DEFAULT 0, category_id INT, supplier_id INT, version INT NOT NULL DEFAULT 0, CONSTRAINT fk_product_category FOREIGN KEY (category_id) REFERENCES productcategories(id));
+CREATE TABLE orders (id INT AUTO_INCREMENT PRIMARY KEY, customer_id INT NOT NULL, order_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, delivery_date DATETIME, shipping_address_id INT, status VARCHAR(50) DEFAULT 'NEW', CONSTRAINT fk_order_customer FOREIGN KEY (customer_id) REFERENCES customers(id));
+CREATE TABLE orderitems (order_id INT NOT NULL, product_id INT NOT NULL, quantity INT NOT NULL, unit_price DECIMAL(10,2) NOT NULL, PRIMARY KEY (order_id, product_id), CONSTRAINT fk_orderitem_order FOREIGN KEY (order_id) REFERENCES orders(id), CONSTRAINT fk_orderitem_product FOREIGN KEY (product_id) REFERENCES products(id));
+CREATE TABLE order_status_history (id BIGINT AUTO_INCREMENT PRIMARY KEY, order_id INT NOT NULL, old_status VARCHAR(50), new_status VARCHAR(50), changed_at DATETIME(6) NOT NULL, changed_by VARCHAR(288) NOT NULL);
+CREATE TABLE product_price_history (id BIGINT AUTO_INCREMENT PRIMARY KEY, product_id INT NOT NULL, price DECIMAL(10,2) NOT NULL, valid_from DATETIME(6) NOT NULL, valid_to DATETIME(6), change_reason VARCHAR(255), changed_by VARCHAR(288) NOT NULL);
+INSERT INTO customers (id, first_name, last_name, email) VALUES (1, 'Testi', 'Asiakas', 'testi@example.com');
+INSERT INTO productcategories (id, name) VALUES (1, 'Elektroniikka'), (2, 'Vaatteet');

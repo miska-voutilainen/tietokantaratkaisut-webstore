@@ -1,0 +1,46 @@
+--------------
+SELECT CURRENT_USER() AS kayttaja
+--------------
+
++---------------------------+
+| kayttaja                  |
++---------------------------+
+| webstore_report@localhost |
++---------------------------+
+1 row in set (0.00 sec)
+
+--------------
+SELECT * FROM v_monthly_sales ORDER BY sales_month DESC LIMIT 3
+--------------
+
++-------------+-------------+------------+-------------+
+| sales_month | order_count | item_count | revenue     |
++-------------+-------------+------------+-------------+
+| 2026-10     |           2 |          2 |     1699.32 |
+| 2025-11     |         814 |      13211 |  6368229.68 |
+| 2025-10     |        5829 |      94806 | 46058280.52 |
++-------------+-------------+------------+-------------+
+3 rows in set (0.00 sec)
+
+--------------
+SELECT * FROM v_order_summary WHERE order_id = 4242
+--------------
+
++----------+---------------------+---------+-------------+------------------+-----------+----------------+--------------+
+| order_id | order_date          | status  | customer_id | customer_name    | item_rows | total_quantity | total_amount |
++----------+---------------------+---------+-------------+------------------+-----------+----------------+--------------+
+|     4242 | 2025-10-20 12:26:51 | SHIPPED |       81007 | Barbara Griffith |         9 |             31 |     14495.26 |
++----------+---------------------+---------+-------------+------------------+-----------+----------------+--------------+
+1 row in set (0.00 sec)
+
+--------------
+SELECT email, phone FROM customers LIMIT 1
+--------------
+
+ERROR 1142 (42000) at line 11: SELECT command denied to user 'webstore_report'@'localhost' for table 'customers'
+--------------
+UPDATE daily_sales_summary SET revenue = 0
+--------------
+
+ERROR 1142 (42000) at line 13: UPDATE command denied to user 'webstore_report'@'localhost' for table 'daily_sales_summary'
+Bye
